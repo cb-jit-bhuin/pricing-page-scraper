@@ -67,23 +67,21 @@ export async function scrapeOrgAddr(url: string, apiToken: string) {
     } catch (error) {
       contactPageText = "NA";
     }
-    // const response = await fetch(url, {
-    //   method: "GET",
-    // });
-    // const html = await response.text();
-    // const regex = /href=["'](.*?)["']/g;
-    // let match;
-    // while ((match = regex.exec(html)) !== null) {
-    //   console.log(match[1]);
-    // }
-    // console.log("home Page------", homePageText);
-    // console.log("about Page------", aboutPageText);
-    //console.log("contact Page------", contactPageText);
+    /* For fetching only the URL present in the html
+    const response = await fetch(url, {
+      method: "GET",
+    });
+    const html = await response.text();
+    const regex = /href=["'](.*?)["']/g;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      console.log(match[1]);
+    }
+    console.log("home Page------", homePageText);
+    console.log("about Page------", aboutPageText);
+    console.log("contact Page------", contactPageText);
+    */
     const text = homePageText + aboutPageText + contactPageText;
-    console.log(
-      "----------------------------------------------------------------------"
-    );
-    //return new Response("Addresssssss");
     const format = `Put the address into a JSON with keys "address_line_1","address_line_2","address_line_3","city","state","country","pin". If you don't find any address, respond with same keys having no value. For multiple address return the most relevant one`;
     const messages: ChatMessage[] = [
       {

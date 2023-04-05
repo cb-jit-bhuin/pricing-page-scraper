@@ -12,6 +12,7 @@ import Code from "../components/Code";
 import CollectAPITokenModal from "../components/CollectAPITokenModal";
 import useLocalStorage from "../utils/hooks/useLocalStorage";
 import * as XLSX from "xlsx";
+import { resolve } from "path";
 
 export const Home: NextPage = () => {
   const router = useRouter();
@@ -47,12 +48,10 @@ export const Home: NextPage = () => {
     XLSX.writeFile(workbook, "chatGPT.xlsx");
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    await generateSummary()
+    generateSummary()
       .then((data) => {
-        //console.log("hello");
-        // console.log(data);
         convertJSONtoSheet(data);
       })
       .catch((error) => {
@@ -61,8 +60,6 @@ export const Home: NextPage = () => {
   };
 
   const setPricingDetails = async (url: string) => {
-    //url = "https://" + url + "/";
-    //i: This one is to call the scrape thing passing the selected file
     const response = await fetch("/api/scrape", {
       method: "POST",
       headers: {
@@ -75,13 +72,14 @@ export const Home: NextPage = () => {
 
     if (!response.ok) {
       toast.error("Sorry something went wrong");
-      return;
+      return Promise.reject("Error fetching pricing details");
     }
 
     const pricingDetails = response.body;
     if (!pricingDetails) {
-      return;
+      return Promise.reject("No pricing details found");
     }
+
     const reader = pricingDetails.getReader();
     const decoder = new TextDecoder();
     let done = false;
@@ -94,7 +92,7 @@ export const Home: NextPage = () => {
       setPricing((prev) => prev + chunkValue);
     }
     setLoading(false);
-    return price;
+    return Promise.resolve(price);
   };
 
   const setOrgAddr = async (url: string) => {
@@ -133,7 +131,6 @@ export const Home: NextPage = () => {
   };
 
   const getURL = () => {};
-
   const generateSummary = async () => {
     return new Promise((resolve, reject) => {
       if (!SelectedFile) {
@@ -157,6 +154,7 @@ export const Home: NextPage = () => {
 
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws);
+
         const promises = data.map(async (obj: any) => {
           if (obj.hasOwnProperty("Pricing")) {
             try {
@@ -168,6 +166,7 @@ export const Home: NextPage = () => {
           } else {
             obj.pricing_plan = "NA";
           }
+
           return obj;
         });
         Promise.all(promises)

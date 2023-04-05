@@ -2,7 +2,6 @@ import { ChatMessage, OpenAIStream } from "../../utils/OpenAIStream";
 import { convert } from "html-to-text";
 
 export async function scrapePricingDetails(url: string, apiToken: string) {
-  url = "https://3dweb.io/pricing";
   try {
     const response = await fetch(url, {
       method: "GET",
@@ -20,11 +19,7 @@ export async function scrapePricingDetails(url: string, apiToken: string) {
     };
     let text = convert(html, options).replace(/^\s*[\r\n]/gm, "\n");
     text = text ? text : "NA";
-    console.log(
-      "----------------------------------------------------------------------"
-    );
-    // console.log(text);
-    return new Response("Pricing plans");
+    //return new Response("Pricing plans");
     const format = `Put this pricing plans into a JSON with keys "plan_name", "plan_amount", "currency_code", "frequency" and "features". Freqency should be either 'monthly' or 'yearly'. Currency code should be in ISO 4217 format. Features should be array of strings. If you don't find any pricing details or there is no input text return keys with empty string assigned. Return only JSON, No extra sentence`;
 
     const messages: ChatMessage[] = [
